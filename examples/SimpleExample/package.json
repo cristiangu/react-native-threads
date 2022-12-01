@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "react": "16.9.0",
-    "react-native": "npm:react-native-tvos@0.61.2-0",
+    "react-native": "0.61.2",
     "react-native-threads": "file:../.."
   },
   "devDependencies": {
@@ -23,6 +23,9 @@
     "metro-react-native-babel-preset": "^0.57.0",
     "react-test-renderer": "16.9.0",
     "reactotron-react-native": "^4.0.2"
+  },
+  "optionalDependencies": {
+    "fsevents": "1.2.7"
   },
   "jest": {
     "preset": "react-native"
