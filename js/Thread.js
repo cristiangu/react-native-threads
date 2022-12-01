@@ -6,12 +6,12 @@ import {
 const { ThreadManager } = NativeModules;
 
 export default class Thread {
-  constructor(jsPath) {
+  constructor(jsPath, threadId) {
     if (!jsPath || !jsPath.endsWith('.js')) {
       throw new Error('Invalid path for thread. Only js files are supported');
     }
 
-    this.id = ThreadManager.startThread(jsPath.replace(".js", ""))
+    this.id = ThreadManager.startThreadIfNeeded(jsPath.replace(".js", ""), threadId)
       .then(id => {
         DeviceEventEmitter.addListener(`Thread${id}`, (message) => {
           !!message && this.onmessage && this.onmessage(message);
