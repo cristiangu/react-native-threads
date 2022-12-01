@@ -9,32 +9,54 @@ NSMutableDictionary *threads;
 
 RCT_EXPORT_MODULE();
 
-RCT_REMAP_METHOD(startThread,
+
+- (RCTBridge *)startThreadIfNeeded: (NSString *)name
+           threadId:(NSNumber *)threadId {
+    
+    if (threads == nil) {
+      threads = [[NSMutableDictionary alloc] init];
+    }
+    
+    RCTBridge *currentThreadBridge = [threads objectForKey:threadId];
+    
+    if(currentThreadBridge != NULL) {
+        ThreadSelfManager *threadSelf = [currentThreadBridge moduleForName:@"ThreadSelfManager"];
+        [threadSelf setThreadId:[threadId intValue]];
+        [threadSelf setParentBridge:self.bridge];
+        return currentThreadBridge;
+    }
+
+    NSURL *threadURL = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:name fallbackResource:name];
+    NSLog(@"starting Thread %@", [threadURL absoluteString]);
+
+
+    RCTBridge *threadBridge = [[RCTBridge alloc] initWithBundleURL:threadURL
+                                              moduleProvider:nil
+                                               launchOptions:nil];
+
+    ThreadSelfManager *threadSelf = [threadBridge moduleForName:@"ThreadSelfManager"];
+    [threadSelf setThreadId:[threadId intValue]];
+    [threadSelf setParentBridge:self.bridge];
+    
+
+    [threads setObject:threadBridge forKey:threadId];
+    
+    return threadBridge;
+    
+    
+}
+
+RCT_REMAP_METHOD(startThreadIfNeeded,
                  name: (NSString *)name
+                 threadId:(NSNumber * _Nonnull)  threadId
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-  if (threads == nil) {
-    threads = [[NSMutableDictionary alloc] init];
-  }
-
-  int threadId = abs(arc4random());
-
-  NSURL *threadURL = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:name fallbackResource:name];
-  NSLog(@"starting Thread %@", [threadURL absoluteString]);
-
-
-   RCTBridge *threadBridge = [[RCTBridge alloc] initWithBundleURL:threadURL
-                                            moduleProvider:nil
-                                             launchOptions:nil];
-
-  ThreadSelfManager *threadSelf = [threadBridge moduleForName:@"ThreadSelfManager"];
-  [threadSelf setThreadId:threadId];
-  [threadSelf setParentBridge:self.bridge];
-
-
-  [threads setObject:threadBridge forKey:[NSNumber numberWithInt:threadId]];
-  resolve([NSNumber numberWithInt:threadId]);
+    
+    
+    [self startThreadIfNeeded:name threadId:threadId];
+    resolve(threadId);
+   
 }
 
 RCT_EXPORT_METHOD(stopThread:(int)threadId)
@@ -83,6 +105,12 @@ RCT_EXPORT_METHOD(postThreadMessage: (int)threadId message:(NSString *)message)
 
   [threads removeAllObjects];
   threads = nil;
+}
+
+
++ (BOOL)requiresMainQueueSetup
+{
+    return NO;
 }
 
 @end

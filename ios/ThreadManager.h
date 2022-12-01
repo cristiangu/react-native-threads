@@ -8,6 +8,9 @@
 #import <React/RCTBundleURLProvider.h>
 
 @interface ThreadManager : NSObject <RCTBridgeModule>
+
+- (RCTBridge *)startThreadIfNeeded:(NSString *)name threadId:(NSNumber *) threadId;
+
 @end
 
 #endif

@@ -14,8 +14,9 @@ export default class App extends Component {
   workerThread = null;
 
   componentDidMount() {
-    this.workerThread = new Thread('./worker.thread.js');
+    this.workerThread = new Thread('./worker.thread.js', 999);
     this.workerThread.onmessage = this.handleMessage;
+    console.log("componentDidMount at: " + Date.now());
   }
 
   componentWillUnmount() {

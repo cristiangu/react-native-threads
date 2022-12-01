@@ -22,4 +22,9 @@ RCT_EXPORT_METHOD(postMessage: (NSString *)message)
                                                body:message];
 }
 
++ (BOOL)requiresMainQueueSetup
+{
+    return NO;
+}
+
 @end

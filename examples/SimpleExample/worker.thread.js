@@ -10,3 +10,6 @@ self.onmessage = message => {
 
   self.postMessage(`Message #${count} from worker thread!`);
 }
+
+for(var i = 0; i<10; i++) { console.log('Custom thread is running at: ' + Date.now()); }
+
